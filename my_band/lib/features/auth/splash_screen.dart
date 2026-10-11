@@ -1,7 +1,5 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'auth_screen.dart';
-import 'home_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'auth_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,30 +19,16 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initializeApp() async {
-    // Небольшая задержка для красоты
     await Future.delayed(const Duration(seconds: 2));
-
     if (!mounted) return;
 
-    // ✅ Проверяем токен
     final loggedIn = await _auth.isLoggedIn();
-
-    print('=== SPLASH CHECK ===');
-    print('isLoggedIn: $loggedIn');
-    print('====================');
-
     if (!mounted) return;
 
     if (loggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      context.go('/home');
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
-      );
+      context.go('/login');
     }
   }
 

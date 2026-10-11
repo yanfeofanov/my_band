@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'auth_service.dart';
-import 'home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  final bool initialLoginMode;
+
+  const AuthScreen({super.key, this.initialLoginMode = true});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -16,19 +18,17 @@ class _AuthScreenState extends State<AuthScreen> {
   final _confirmPasswordController = TextEditingController();
 
   final _auth = AuthService();
-  bool _isLogin = true;
+  late bool _isLogin;
   bool _isLoading = false;
   String? _errorMessage;
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  void _toggleMode() {
-    setState(() {
-      _isLogin = !_isLogin;
-      _errorMessage = null;
-      _confirmPasswordController.clear();
-    });
+  @override
+  void initState() {
+    super.initState();
+    _isLogin = widget.initialLoginMode;
   }
 
   Future<void> _submit() async {
@@ -52,19 +52,19 @@ class _AuthScreenState extends State<AuthScreen> {
 
       if (result['success'] == true) {
         if (_isLogin) {
+          // ✅ Успешный вход → главный экран
           if (!mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
+          context.go('/home');
         } else {
+          // ✅ Успешная регистрация → на экран входа
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Регистрация успешна! Теперь войдите.'),
               backgroundColor: Colors.green,
             ),
           );
-          _toggleMode();
+          if (!mounted) return;
+          context.go('/login');
         }
       } else {
         setState(() {
@@ -161,7 +161,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Подтверждение пароля
+                // Подтверждение пароля (только регистрация)
                 if (!_isLogin) ...[
                   TextFormField(
                     controller: _confirmPasswordController,
@@ -191,7 +191,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Ошибка
+                // Сообщение об ошибке
                 if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -232,9 +232,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
                 const SizedBox(height: 16),
 
-                // Переключение режима
+                // Переключение вход/регистрация через роутер
                 TextButton(
-                  onPressed: _isLoading ? null : _toggleMode,
+                  onPressed: _isLoading
+                      ? null
+                      : () => context.go(_isLogin ? '/register' : '/login'),
                   child: Text(
                     _isLogin
                         ? 'Нет аккаунта? Зарегистрироваться'
