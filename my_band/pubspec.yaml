@@ -1,0 +1,27 @@
+name: my_band
+description: My Band - приложение с авторизацией через Supabase.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+  shared_preferences: ^2.2.0
+  go_router: ^14.2.0
+  cupertino_icons: ^1.0.8
+  flutter_onnxruntime: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/models/minigpt.onnx
+    - assets/models/vocab.json
